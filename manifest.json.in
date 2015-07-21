@@ -1,0 +1,20 @@
+{
+    "name": "ubtd.mzanetti",
+    "description": "description of ubtd",
+    "architecture": "@CLICK_ARCH@",
+    "title": "ubtd",
+    "hooks": {
+        "app": {
+            "apparmor": "app/app.apparmor",
+            "desktop": "app/app.desktop"
+        },
+        "shareplugin": {
+            "apparmor": "shareplugin/shareplugin.apparmor",
+            "desktop": "shareplugin/shareplugin.desktop",
+            "content-hub": "shareplugin/bluetooth-contenthub.json"
+        }
+    },
+    "version": "0.1",
+    "maintainer": "Michael Zanetti <michael.zanetti@canonical.com>",
+    "framework": "ubuntu-sdk-15.04"
+}

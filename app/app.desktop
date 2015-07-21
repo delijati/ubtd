@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=app
+Exec=app
+Icon=app/app.png
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
+
