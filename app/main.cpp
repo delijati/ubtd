@@ -11,11 +11,13 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     Adapter adapter;
+//    BluezClient client;
     Obexd obexd;
 
     QQuickView view;
 
     view.rootContext()->setContextProperty("obexd", &obexd);
+    qmlRegisterUncreatableType<Transfer>("ubtd", 1, 0, "Transfer", "get them from obexd");
 
     view.setSource(QUrl(QStringLiteral("qrc:///Main.qml")));
     view.setResizeMode(QQuickView::SizeRootObjectToView);

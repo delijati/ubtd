@@ -6,18 +6,13 @@ load(ubuntu-click)
 QT += qml quick dbus bluetooth
 
 SOURCES += main.cpp \
-#    adapter.cpp \
-#    obexd.cpp \
-    obexagent.cpp \
-    obexagentadaptor.cpp \
-#    transfer.cpp
     bttransfer.cpp
 
 RESOURCES += shareplugin.qrc
 
 OTHER_FILES += shareplugin.apparmor \
                shareplugin.desktop \
-               shareplugin.png \
+               icon.svg \
                bluetooth-contenthub.json
 
 #specify where the config files are installed to
@@ -30,11 +25,5 @@ INSTALLS+=config_files
 target.path = $${UBUNTU_CLICK_BINARY_PATH}
 INSTALLS+=target
 
-HEADERS += \
-#    adapter.h \
-#    obexd.h \
-    obexagent.h \
-    obexagentadaptor.h \
-#    transfer.h
-    bttransfer.h
+HEADERS += bttransfer.h
 

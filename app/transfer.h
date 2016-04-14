@@ -2,19 +2,28 @@
 #define TRANSFER_H
 
 #include <QObject>
+#include <QDBusInterface>
 
 class Transfer : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(Status)
     Q_PROPERTY(QString filename READ filename NOTIFY filenameChanged)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
     Q_PROPERTY(qint32 total READ total NOTIFY totalChanged)
     Q_PROPERTY(qint32 transferred READ transferred NOTIFY transferredChanged)
-    Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
-    Q_PROPERTY(bool success READ success NOTIFY completedChanged)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
 public:
-    explicit Transfer(const QString &path, const QString &filePath, const QString &filename, QObject *parent = 0);
+    enum Status {
+        StatusQueued,
+        StatusActive,
+        StatusSuspended,
+        StatusComplete,
+        StatusError
+    };
+
+    explicit Transfer(const QString &path, const QString &filePath, QObject *parent = 0);
 
     QString path() const;
     void move(const QString &newFilePath);
@@ -22,33 +31,33 @@ public:
     QString filename() const;
     QString filePath() const;
 
-    void setStarted();
-    void setCompleted(bool success);
+    quint64 total() const;
+    quint64 transferred() const;
 
-    qint32 total() const;
-    qint32 transferred() const;
-
-    bool completed() const;
-    bool success() const;
+    Status status() const;
 
 signals:
     void filenameChanged();
     void filePathChanged();
     void totalChanged();
     void transferredChanged();
-    void completedChanged();
-
-private slots:
-    void progress(qint32 total, qint32 transferred);
+    void statusChanged();
 
 private:
+    QVariant fetchProperty(const QString &propertyName) const;
+    static Status statusStringToStatus(const QString &statusString);
+
+private slots:
+    void propertiesChanged(const QString &interface, const QVariantMap &changedProperties, const QStringList &invalidatedProperties);
+
+private:
+    QDBusInterface *m_iface;
     QString m_path;
     QString m_filePath;
     QString m_filename;
-    qint32 m_total;
-    qint32 m_transferred;
-    bool m_completed;
-    bool m_success;
+    qint64 m_total;
+    qint64 m_transferred;
+    Status m_status;
 };
 
 #endif // TRANSFER_H

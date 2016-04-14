@@ -11,21 +11,27 @@
 
 #include "obexagentadaptor.h"
 
-class ObexAgent : public QObject
+class ObexAgent : public QObject, protected QDBusContext
 {
     Q_OBJECT
 public:
     explicit ObexAgent(QObject *parent = 0);
 
+    void accept(const QString & path, const QString &fileName);
+
 signals:
-    void authorized(const QString &path, const QString &filePath, const QString &filename, const QString btAddress, const QString &type, int length);
+    void authorized(const QString &path);
 
 public slots:
-    QString Authorize(const QDBusObjectPath &transfer, const QString &bt_address, const QString &name, const QString &type, int length, int time);
+    QString AuthorizePush(const QDBusObjectPath &transfer);
+    void Cancel() {}
+    void Release() {}
 
 private:
     QDBusConnection m_dbus;
     ObexAgentAdaptor *m_agent;
+
+    QHash<QString, QDBusMessage> m_pendingRequests;
 };
 
 #endif // OBEXAGENT_H

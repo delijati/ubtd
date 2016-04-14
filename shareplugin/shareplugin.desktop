@@ -1,8 +1,9 @@
 [Desktop Entry]
 Name=Bluetooth
 Exec=shareplugin
-Icon=shareplugin/shareplugin.png
+Icon=shareplugin/icon.svg
 Terminal=false
 Type=Application
 X-Ubuntu-Touch=true
+OnlyShowIn=Old
 

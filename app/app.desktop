@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=app
+Name=Bluetooth File Transfer
 Exec=app
-Icon=app/app.png
+Icon=app/icon.svg
 Terminal=false
 Type=Application
 X-Ubuntu-Touch=true

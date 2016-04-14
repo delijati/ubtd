@@ -3,7 +3,8 @@ TARGET = app
 
 load(ubuntu-click)
 
-QT += qml quick dbus
+QT += qml quick dbus bluetooth
+CONFIG += c++11
 
 SOURCES += main.cpp \
     adapter.cpp \
@@ -16,7 +17,7 @@ RESOURCES += app.qrc
 
 OTHER_FILES += app.apparmor \
                app.desktop \
-               app.png
+               icon.svg
 
 #specify where the config files are installed to
 config_files.path = /app
@@ -34,4 +35,5 @@ HEADERS += \
     obexagent.h \
     obexagentadaptor.h \
     transfer.h
+
 

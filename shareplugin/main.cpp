@@ -10,14 +10,10 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-//    Adapter adapter;
-//    Obexd obexd;
-
-    QQuickView view;
-
     qmlRegisterType<BtTransfer>("Shareplugin", 0, 1, "BtTransfer");
 
-//    view.rootContext()->setContextProperty("obexd", &obexd);
+    QQuickView view;
+    QObject::connect(view.engine(), &QQmlEngine::quit, &app, &QCoreApplication::quit);
 
     view.setSource(QUrl(QStringLiteral("qrc:///Main.qml")));
     view.setResizeMode(QQuickView::SizeRootObjectToView);

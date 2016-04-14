@@ -33,17 +33,22 @@ ObexAgentAdaptor::~ObexAgentAdaptor()
     // destructor
 }
 
-QString ObexAgentAdaptor::Authorize(const QDBusObjectPath &transfer, const QString &bt_address, const QString &name, const QString &type, int length, int time)
+QString ObexAgentAdaptor::AuthorizePush(const QDBusObjectPath &transfer)
 {
-    // handle method call org.openobex.Agent.Authorize
+    // handle method call org.bluez.obex.Agent1.AuthorizePush
     QString path;
-    QMetaObject::invokeMethod(parent(), "Authorize", Q_RETURN_ARG(QString, path), Q_ARG(QDBusObjectPath, transfer), Q_ARG(QString, bt_address), Q_ARG(QString, name), Q_ARG(QString, type), Q_ARG(int, length), Q_ARG(int, time));
+    QMetaObject::invokeMethod(parent(), "AuthorizePush", Q_RETURN_ARG(QString, path), Q_ARG(QDBusObjectPath, transfer));
     return path;
 }
 
 void ObexAgentAdaptor::Cancel()
 {
-    // handle method call org.openobex.Agent.Cancel
+    // handle method call org.bluez.obex.Agent1.Cancel
     QMetaObject::invokeMethod(parent(), "Cancel");
 }
 
+void ObexAgentAdaptor::Release()
+{
+    // handle method call org.bluez.obex.Agent1.Release
+    QMetaObject::invokeMethod(parent(), "Release");
+}

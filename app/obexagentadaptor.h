@@ -24,22 +24,20 @@ class QVariant;
 QT_END_NAMESPACE
 
 /*
- * Adaptor class for interface org.openobex.Agent
+ * Adaptor class for interface org.bluez.obex.Agent1
  */
 class ObexAgentAdaptor: public QDBusAbstractAdaptor
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.openobex.Agent")
+    Q_CLASSINFO("D-Bus Interface", "org.bluez.obex.Agent1")
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.openobex.Agent\">\n"
-"    <method name=\"Authorize\">\n"
+"    <method name=\"Release\">\n"
+"      <annotation value=\"\" name=\"org.freedesktop.DBus.GLib.Async\"/>\n"
+"    </method>\n"
+"    <method name=\"AuthorizePush\">\n"
 "      <annotation value=\"\" name=\"org.freedesktop.DBus.GLib.Async\"/>\n"
 "      <arg type=\"o\" name=\"transfer\"/>\n"
-"      <arg type=\"s\" name=\"bt_address\"/>\n"
-"      <arg type=\"s\" name=\"name\"/>\n"
-"      <arg type=\"s\" name=\"type\"/>\n"
-"      <arg type=\"i\" name=\"length\"/>\n"
-"      <arg type=\"i\" name=\"time\"/>\n"
 "      <arg direction=\"out\" type=\"s\" name=\"path\"/>\n"
 "    </method>\n"
 "    <method name=\"Cancel\">\n"
@@ -53,7 +51,8 @@ public:
 
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
-    QString Authorize(const QDBusObjectPath &transfer, const QString &bt_address, const QString &name, const QString &type, int length, int time);
+    void Release();
+    QString AuthorizePush(const QDBusObjectPath &transfer);
     void Cancel();
 Q_SIGNALS: // SIGNALS
 };

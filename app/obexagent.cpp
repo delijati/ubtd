@@ -13,17 +13,24 @@ ObexAgent::ObexAgent(QObject *parent) :
 
 }
 
-QString ObexAgent::Authorize(const QDBusObjectPath &transfer, const QString &bt_address, const QString &name, const QString &type, int length, int time)
+void ObexAgent::accept(const QString &path, const QString &fileName)
+{
+    if (!m_pendingRequests.contains(path)) {
+        return;
+    }
+    QDBusMessage msg = m_pendingRequests.take(path);
+    QDBusConnection::sessionBus().send(msg.createReply(fileName));
+}
+
+QString ObexAgent::AuthorizePush(const QDBusObjectPath &transfer)
 {
     qDebug() << "authorize called" <<  transfer.path();
 
-    QString targetPath = "/tmp/obexd/";
-    QDir dir(targetPath);
-    if (!dir.exists()) {
-        dir.mkpath(targetPath);
-    }
 
-    emit authorized(transfer.path(), targetPath, name, bt_address, type, length);
-    return targetPath + name;
+    setDelayedReply(true);
+    m_pendingRequests[transfer.path()] = message();
+    QTimer::singleShot(0, [this, transfer]() { emit authorized(transfer.path());});
+    qDebug() << "returning";
+    return QString();
 }
 

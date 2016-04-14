@@ -18,8 +18,7 @@ public:
         RoleFilePath,
         RoleSize,
         RoleTransferred,
-        RoleCompleted,
-        RoleSuccess
+        RoleStatus
     };
 
     explicit Obexd(QObject *parent = 0);
@@ -31,11 +30,11 @@ public:
 signals:
 
 private slots:
-    void newTransfer(const QString &path, const QString &filePath, const QString &filename, const QString btAddress, const QString &type, int length);
-    void transferStarted(const QDBusObjectPath &transfer);
-    void transferCompleted(QDBusObjectPath transfer, bool success);
+    void newTransfer(const QString &path);
 
     void transferProgress();
+    void transferStatusChanged();
+
 private:
     ObexAgent *m_agent;
     QDBusConnection m_dbus;

@@ -14,7 +14,7 @@
             "content-hub": "shareplugin/bluetooth-contenthub.json"
         }
     },
-    "version": "0.1",
+    "version": "0.2",
     "maintainer": "Michael Zanetti <michael.zanetti@canonical.com>",
-    "framework": "ubuntu-sdk-15.04"
+    "framework": "ubuntu-sdk-15.04.3"
 }
