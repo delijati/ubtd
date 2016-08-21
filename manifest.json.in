@@ -1,8 +1,8 @@
 {
     "name": "ubtd.mzanetti",
-    "description": "description of ubtd",
+    "description": "Enables sending and receiving files on your Ubuntu device",
     "architecture": "@CLICK_ARCH@",
-    "title": "ubtd",
+    "title": "Bluetooth file transfer",
     "hooks": {
         "app": {
             "apparmor": "app/app.apparmor",
@@ -14,7 +14,7 @@
             "content-hub": "shareplugin/bluetooth-contenthub.json"
         }
     },
-    "version": "0.2",
+    "version": "0.6",
     "maintainer": "Michael Zanetti <michael.zanetti@canonical.com>",
     "framework": "ubuntu-sdk-15.04.3"
 }

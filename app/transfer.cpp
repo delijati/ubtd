@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QDBusReply>
+#include <QFileInfo>
 
 Transfer::Transfer(const QString &path, const QString &filePath, QObject *parent) :
     QObject(parent),
@@ -15,17 +16,26 @@ Transfer::Transfer(const QString &path, const QString &filePath, QObject *parent
     m_status(Status::StatusQueued)
 {
 
-    m_iface = new QDBusInterface("org.bluez.obex", path, "org.bluez.obex.Transfer", QDBusConnection::sessionBus(), this);
+    if (path == "/completed") {
+        QFileInfo fi(filePath);
+        m_filePath = fi.absolutePath();
+        m_filename = fi.fileName();
+        m_status = StatusComplete;
 
-    qDebug() << "name" << fetchProperty("Name");
+    } else {
 
-    m_filename = fetchProperty("Name").toString();
-    m_total = fetchProperty("Size").toULongLong();
-    m_status = statusStringToStatus(fetchProperty("Status").toString());
-    m_transferred = fetchProperty("Transferred").toULongLong();
-    qDebug() << "filename" << m_filename;
+        m_iface = new QDBusInterface("org.bluez.obex", path, "org.bluez.obex.Transfer", QDBusConnection::sessionBus(), this);
 
-    qDebug() << "connected signal" << QDBusConnection::sessionBus().connect("org.bluez.obex", path, "org.freedesktop.DBus.Properties", "PropertiesChanged", "sa{sv}as", this, SLOT(propertiesChanged(QString, QVariantMap, QStringList)));
+        qDebug() << "name" << fetchProperty("Name");
+
+        m_filename = fetchProperty("Name").toString();
+        m_total = fetchProperty("Size").toULongLong();
+        m_status = statusStringToStatus(fetchProperty("Status").toString());
+        m_transferred = fetchProperty("Transferred").toULongLong();
+        qDebug() << "filename" << m_filename;
+
+        qDebug() << "connected signal" << QDBusConnection::sessionBus().connect("org.bluez.obex", path, "org.freedesktop.DBus.Properties", "PropertiesChanged", "sa{sv}as", this, SLOT(propertiesChanged(QString, QVariantMap, QStringList)));
+    }
 
 }
 

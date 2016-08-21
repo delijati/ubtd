@@ -20,6 +20,13 @@ Obexd::Obexd(QObject *parent) :
             qWarning() << "Error registering agent for the default adapter:" << reply.error();
 
     connect(m_agent, &ObexAgent::authorized, this, &Obexd::newTransfer);
+
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+    qDebug() << "have entries:" << dir.entryList() << dir.path();
+    foreach (const QFileInfo &fileInfo, dir.entryInfoList(QDir::Files)) {
+        Transfer* t = new Transfer("/completed", fileInfo.absoluteFilePath(), this);
+        m_transfers.append(t);
+    }
 }
 
 int Obexd::rowCount(const QModelIndex &parent) const
@@ -41,6 +48,8 @@ QVariant Obexd::data(const QModelIndex &index, int role) const
         return m_transfers.at(index.row())->transferred();
     case RoleStatus:
         return m_transfers.at(index.row())->status();
+    case RoleDate:
+        return QFileInfo(m_transfers.at(index.row())->filePath() + "/" + m_transfers.at(index.row())->filename()).created();
     }
     return QVariant();
 }
@@ -53,7 +62,17 @@ QHash<int, QByteArray> Obexd::roleNames() const
     roles.insert(RoleSize, "size");
     roles.insert(RoleTransferred, "transferred");
     roles.insert(RoleStatus, "status");
+    roles.insert(RoleDate, "date");
     return roles;
+}
+
+void Obexd::deleteFile(int index)
+{
+    beginRemoveRows(QModelIndex(), index, index);
+    Transfer* t = m_transfers.takeAt(index);
+    QFile f(t->filePath() + "/" + t->filename());
+    f.remove();
+    endRemoveRows();
 }
 
 void Obexd::newTransfer(const QString &path)

@@ -18,7 +18,8 @@ public:
         RoleFilePath,
         RoleSize,
         RoleTransferred,
-        RoleStatus
+        RoleStatus,
+        RoleDate
     };
 
     explicit Obexd(QObject *parent = 0);
@@ -27,7 +28,8 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
-signals:
+public slots:
+    void deleteFile(int index);
 
 private slots:
     void newTransfer(const QString &path);

@@ -12,7 +12,7 @@ MainView {
     width: units.gu(100)
     height: units.gu(75)
 
-    property string fileName
+    property var fileNames: []
     property bool peerSelected: false
 
     BtTransfer {
@@ -23,9 +23,13 @@ MainView {
         target: ContentHub
 
         onShareRequested: {
-            var filePath = String(transfer.items[0].url).replace('file://', '')
-            print("Should share file", filePath)
-            root.fileName = filePath;
+            var tmp = []
+            for (var i = 0; i < transfer.items.length; i++) {
+                var filePath = String(transfer.items[i].url).replace('file://', '')
+                print("Should share file", filePath)
+                tmp.push(filePath);
+            }
+            root.fileNames = tmp
         }
     }
 
@@ -131,55 +135,109 @@ MainView {
             columns: width > height ? 2 : 1
 
             Item {
-                Layout.fillHeight: true
                 Layout.fillWidth: true
+                Layout.fillHeight: true
+                GridLayout {
+                    anchors.fill: parent
+                    columns: Math.ceil(Math.sqrt(root.fileNames.length))
 
-                Image {
-                    id: transferredImage
-                    anchors.fill: parent
-                    anchors.margins: units.gu(2)
-                    source: "file://" + root.fileName
-                    fillMode: Image.PreserveAspectFit
-                }
-                Icon {
-                    anchors.fill: parent
-                    anchors.margins: units.gu(2)
-                    visible: transferredImage.status === Image.Error || !root.fileName
-                    name: {
-                        var extension = root.fileName.split(".").pop()
-                        switch(extension) {
-                        case "pdf":
-                            return "application-pdf-symbolic";
-                        case "tar":
-                        case "gz":
-                        case "gzip":
-                        case "zip":
-                        case "xz":
-                            return "application-x-archive-symbolic";
-                        case "mp3":
-                        case "ogg":
-                        case "wav":
-                        case "flac":
-                            return "audio-x-generic-symbolic";
-                        case "jpg":
-                        case "gif":
-                        case "jpeg":
-                        case "png":
-                        case "webp":
-                            return "image-x-generic-symbolic";
-                        case "click":
-                        case "deb":
-                            return "package-x-generic-symbolic";
-                        case "txt":
-                            return "text-generic-symbolic";
-                        case "mp4":
-                        case "mkv":
-                        case "avi":
-                        case "mpeg":
-                        case "mpg":
-                            return "video-x-generic-symbolic";
-                        default:
-                            return "empty-symbolic";
+                    Repeater {
+                        model: root.fileNames
+                        Item {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+
+                            UbuntuShape {
+                                anchors.fill: parent
+                                anchors.margins: units.gu(2)
+                                aspect: UbuntuShape.DropShadow
+                                sourceFillMode: Image.PreserveAspectCrop
+                                source: Image {
+                                    id: transferredImage
+                                    source: "file://" + modelData
+                                }
+                            }
+
+                            Icon {
+                                anchors.fill: parent
+                                anchors.margins: units.gu(2)
+                                visible: transferredImage.status === Image.Error
+                                name: {
+                                    var extension = modelData.split(".").pop()
+                                    switch(extension) {
+                                    case "pdf":
+                                        return "application-pdf-symbolic";
+                                    case "tar":
+                                    case "gz":
+                                    case "gzip":
+                                    case "zip":
+                                    case "xz":
+                                        return "application-x-archive-symbolic";
+                                    case "mp3":
+                                    case "ogg":
+                                    case "wav":
+                                    case "flac":
+                                        return "audio-x-generic-symbolic";
+                                    case "jpg":
+                                    case "gif":
+                                    case "jpeg":
+                                    case "png":
+                                    case "webp":
+                                        return "image-x-generic-symbolic";
+                                    case "click":
+                                    case "deb":
+                                        return "package-x-generic-symbolic";
+                                    case "txt":
+                                        return "text-generic-symbolic";
+                                    case "mp4":
+                                    case "mkv":
+                                    case "avi":
+                                    case "mpeg":
+                                    case "mpg":
+                                        return "video-x-generic-symbolic";
+                                    default:
+                                        return "empty-symbolic";
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.centerIn: parent
+                                color: "white"
+                                border.width: units.dp(2)
+                                border.color: UbuntuColors.blue
+                                radius: width / 2
+                                height: units.gu(8)
+                                width: height
+                                visible: isInProgress || isDone || isError
+
+                                property bool isInProgress: transfer.currentFile === modelData
+                                property bool isDone: false
+                                property bool isError: false
+                                onIsInProgressChanged: {
+                                    print("isinprogresschanged:", isInProgress, transfer.error)
+                                    if (!isInProgress) {
+                                        isDone = !transfer.error;
+                                        isError = !!transfer.error
+                                    }
+                                }
+
+                                ActivityIndicator {
+                                    anchors.centerIn: parent
+                                    visible: running
+                                    running: !transfer.finished && transfer.progress > 0 && !parent.isDone
+                                }
+
+                                Icon {
+                                    anchors.centerIn: parent
+                                    width: units.gu(6)
+                                    height: width
+                                    name: parent.isDone ? "tick" : "close"
+                                    color: parent.isDone ? UbuntuColors.green : UbuntuColors.red
+                                    visible: parent.isDone || parent.isError
+                                }
+                            }
+
                         }
                     }
                 }
@@ -196,14 +254,15 @@ MainView {
                     clip: true
 
                     delegate: ListItem {
-                        height: units.gu(6)
-                        Label {
-                            anchors.centerIn: parent
-                            text: (deviceName ? deviceName : name)
+                        ListItemLayout {
+                            title.text: (deviceName ? deviceName : name)
                         }
+
                         onClicked: {
                             btModel.continuousDiscovery = false;
-                            transfer.sendFile(remoteAddress, root.fileName)
+                            for (var i = 0; i < root.fileNames.length; i++) {
+                                transfer.sendFile(remoteAddress, root.fileNames[i])
+                            }
                             root.peerSelected = true;
                         }
                     }
@@ -218,8 +277,8 @@ MainView {
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
                         text: transfer.error ? "Transfer failed."
-                                : transfer.finished ? "File transferred."
-                                : "Transferring file..."
+                                : transfer.finished ? (root.fileNames.length == 1 ? "File transferred." : "All files transferred.")
+                                : "Transferring..."
                         fontSize: "large"
                     }
 

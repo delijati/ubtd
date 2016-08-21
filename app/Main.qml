@@ -1,6 +1,7 @@
 import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import Ubuntu.Components 1.3
+import Ubuntu.Components.ListItems 1.3
 import Ubuntu.Content 1.3
 import ubtd 1.0
 
@@ -26,27 +27,46 @@ MainView {
         ColumnLayout {
             spacing: units.gu(1)
             anchors {
-                margins: units.gu(2)
                 fill: parent
                 topMargin: mainPage.header.height + units.gu(1)
             }
 
-            Label {
-                id: label
-                text: i18n.tr("Waiting for incoming file...")
-                fontSize: "large"
+            Column {
                 Layout.fillWidth: true
-                wrapMode: Text.WordWrap
+                Layout.preferredHeight: childrenRect.height
+                spacing: units.gu(1)
+
+                ColumnLayout {
+                    width: parent.width - units.gu(4)
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Label {
+                        id: label
+                        text: i18n.tr("Your Ubuntu device is now ready to receive files via Bluetooth...")
+                        fontSize: "large"
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                    }
+                    Label {
+                        text: i18n.tr("Send a file via Bluetooth to your Ubuntu phone. It will appear in the list below.")
+                        fontSize: "x-small"
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                    }
+                }
+                ThinDivider {
+
+                }
+                Label {
+                    text: i18n.tr("Transfers:")
+                    anchors { left: parent.left; right: parent.right; margins: units.gu(2) }
+                }
             }
-            Label {
-                text: i18n.tr("Send a file via Bluetooth to your Ubuntu phone")
-                fontSize: "x-small"
-                Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-            }
+
             ListView {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                clip: true
 
                 model: obexd
 
@@ -57,22 +77,35 @@ MainView {
                         pageStack.push(pickerPageComponent, {contentType: listItem.contentType, filePath: model.filePath + "/" + model.filename})
                     }
 
+                    leadingActions: ListItemActions {
+                        actions: [
+                            Action {
+                                iconName: "delete"
+                                onTriggered: obexd.deleteFile(index)
+                            }
+                        ]
+                    }
+
                     property var contentType: null
 
                     RowLayout {
-                        anchors { fill: parent; margins: units.gu(1) }
+                        anchors { fill: parent; leftMargin: units.gu(2); rightMargin: units.gu(2); topMargin: units.gu(1); bottomMargin: units.gu(1) }
 
 
                         Item {
                             Layout.fillHeight: true
                             Layout.preferredWidth: height
 
-                            Image {
-                                id: transferredImage
+                            UbuntuShape {
                                 anchors.fill: parent
-                                source: model.status === Transfer.StatusComplete ? "file://" + filePath + "/" + filename : ""
-                                fillMode: Image.PreserveAspectFit
+                                aspect: UbuntuShape.DropShadow
+                                sourceFillMode: Image.PreserveAspectCrop
+                                source: Image {
+                                    id: transferredImage
+                                    source: model.status === Transfer.StatusComplete ? "file://" + filePath + "/" + filename : ""
+                                }
                             }
+
                             Icon {
                                 anchors.fill: parent
                                 visible: status !== Transfer.StatusComplete || transferredImage.status === Image.Error
@@ -132,6 +165,7 @@ MainView {
                             UbuntuShape {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: units.dp(5)
+                                visible: status == Transfer.StatusActive
                                 UbuntuShape {
                                     anchors.fill: parent
                                     color: UbuntuColors.blue
@@ -149,7 +183,7 @@ MainView {
                                     case Transfer.StatusSuspended:
                                         return "Paused"
                                     case Transfer.StatusComplete:
-                                        return "Complete";
+                                        return "Completed (" + Qt.formatDateTime(date) + ")";
                                     case Transfer.StatusError:
                                         return "Failed";
                                     }
