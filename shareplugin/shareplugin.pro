@@ -4,6 +4,7 @@ TARGET = shareplugin
 load(ubuntu-click)
 
 QT += qml quick dbus bluetooth
+CONFIG += c++11
 
 SOURCES += main.cpp \
     bttransfer.cpp
